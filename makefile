@@ -44,12 +44,20 @@ OBJ := \
 	edcardwrcart.o      \
 	edcardswap.o
 
+ifeq ($(MODSDK),0)
 HOST    := mips-linux-gnu
+else
+HOST    := mips-n64
+endif
 
 CC      := $(HOST)-gcc
 AR      := $(HOST)-ar
 ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
+ifeq ($(MODSDK),0)
 FLAG    := -Iultra/include -Iinclude -D_ULTRA64
+else
+FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64 -DNEWLIB
+endif
 OPT     := -Os
 WFLAG   := -Wall -Wextra -Wpedantic
 CCFLAG  := $(ARCH) -mno-check-zero-division -ffreestanding
@@ -68,7 +76,11 @@ N64_CCFLAG  += $(N64_FLAG) $(N64_OPT) $(N64_WFLAG)
 N64_ASFLAG  := $(N64_ARCH)
 
 .PHONY: default
+ifeq ($(MODSDK),0)
 default: lib/libcart_ultra.a lib/libcart_dragon.a
+else
+default: lib/libcart_ultra.a
+endif
 
 .PHONY: clean
 clean:
