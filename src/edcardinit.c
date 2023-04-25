@@ -1,11 +1,10 @@
 /******************************************************************************/
 /*               libcart - Nintendo 64 flash cartridge library                */
-/*                        Copyright (C) 2022 devwizard                        */
+/*                    Copyright (C) 2022 - 2023 devwizard                     */
 /*     This project is licensed under the terms of the MIT license.  See      */
 /*     LICENSE for more information.                                          */
 /******************************************************************************/
 
-#include <string.h>
 #include <cart.h>
 #include "cartint.h"
 #include "sd.h"
@@ -19,12 +18,11 @@ int ed_card_init(void)
     u32 rca;
     __cart_acs_get();
     __sd_type = 0;
-    if ((__ed_reg_rd(ED_VER_REG) & 0xFFFF) >= 0x116)
+    if ((__cart_rd(ED_VER_REG) & 0xFFFF) >= 0x116)
     {
-        __ed_reg_wr(ED_CFG_REG, ED_CFG_SDRAM_OFF);
-        __cart_dma_rd(__cart_buf, 0x10000020, 16);
-        __ed_reg_wr(ED_CFG_REG, ED_CFG_SDRAM_ON);
-        if (!memcmp(__cart_buf, "ED64 SD boot", 12)) __sd_type = 1;
+        __cart_wr(ED_CFG_REG, ED_CFG_SDRAM_OFF);
+        if (__cart_rd(0x10000024) == 0x20534420) __sd_type = 1;
+        __cart_wr(ED_CFG_REG, ED_CFG_SDRAM_ON);
     }
     __sd_cfg = ED_SPI_SPD_LO;
     if (__sd_type) __sd_cfg |= ED_SPI_SS;

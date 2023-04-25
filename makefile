@@ -1,5 +1,5 @@
 #                libcart - Nintendo 64 flash cartridge library
-#                         Copyright (C) 2022 devwizard
+#                     Copyright (C) 2022 - 2023 devwizard
 #      This project is licensed under the terms of the MIT license.  See
 #      LICENSE for more information.
 
@@ -42,37 +42,46 @@ OBJ := \
 	edcardrdcart.o      \
 	edcardwrdram.o      \
 	edcardwrcart.o      \
-	edcardswap.o
+	edcardswap.o        \
+	sc.o                \
+	scinit.o            \
+	scexit.o            \
+	sccardinit.o        \
+	sccardrddram.o      \
+	sccardrdcart.o      \
+	sccardwrdram.o      \
+	sccardwrcart.o      \
+	sccardswap.o
 
 ifeq ($(MODSDK),0)
-HOST    := mips-linux-gnu
+U64_HOST    := mips-linux-gnu
 else
-HOST    := mips-n64
+U64_HOST    := mips-n64
 endif
-
-CC      := $(HOST)-gcc
-AR      := $(HOST)-ar
-ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
+U64_HOST    := mips-linux-gnu
+U64_CC      := $(U64_HOST)-gcc
+U64_AR      := $(U64_HOST)-ar
+U64_ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
 ifeq ($(MODSDK),0)
-FLAG    := -Iultra/include -Iinclude -D_ULTRA64
+U64_FLAG    := -Iultra/include -Iinclude -D_ULTRA64
 else
-FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64 -DNEWLIB
+U64_FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64 -DNEWLIB
 endif
-OPT     := -Os
-WFLAG   := -Wall -Wextra -Wpedantic
-CCFLAG  := $(ARCH) -mno-check-zero-division -ffreestanding
-CCFLAG  += -fno-common -fno-toplevel-reorder
-CCFLAG  += $(FLAG) $(OPT) $(WFLAG)
-ASFLAG  := $(ARCH) $(FLAG) $(OPT) $(WFLAG)
+U64_OPT     := -Os
+U64_WARN    := -Wall -Wextra -Wpedantic
+U64_CCFLAG  := $(U64_ARCH) -mno-check-zero-division -ffreestanding
+U64_CCFLAG  += -fno-common -fno-toplevel-reorder
+U64_CCFLAG  += $(U64_FLAG) $(U64_OPT) $(U64_WARN)
+U64_ASFLAG  := $(U64_ARCH) $(U64_FLAG) $(U64_OPT)
 
 N64_CC      := $(N64_INST)/bin/mips64-elf-gcc
 N64_AR      := $(N64_INST)/bin/mips64-elf-ar
 N64_ARCH    := -march=vr4300 -mtune=vr4300
-N64_FLAG    := -I$(N64_INST)/mips64-elf/include -Iinclude -DN64 -DDEBUG
+N64_FLAG    := -I$(N64_INST)/mips64-elf/include -Iinclude -DN64
 N64_OPT     := -O2
-N64_WFLAG   := -Wall -Wextra -Wno-ignored-qualifiers
+N64_WARN    := -Wall -Wextra -Wno-ignored-qualifiers
 N64_CCFLAG  := $(N64_ARCH) -falign-functions=32 -ffunction-sections -fdata-sections
-N64_CCFLAG  += $(N64_FLAG) $(N64_OPT) $(N64_WFLAG)
+N64_CCFLAG  += $(N64_FLAG) $(N64_OPT) $(N64_WARN)
 N64_ASFLAG  := $(N64_ARCH)
 
 .PHONY: default
@@ -88,15 +97,15 @@ clean:
 
 lib/libcart_ultra.a: $(addprefix build/ultra/,$(OBJ))
 	@mkdir -p $(dir $@)
-	$(AR) rc $@ $^
+	$(U64_AR) rc $@ $^
 
 build/ultra/%.o: src/%.s
 	@mkdir -p $(dir $@)
-	$(CC) $(ASFLAG) -c -o $@ $<
+	$(U64_CC) $(U64_ASFLAG) -c -o $@ $<
 
 build/ultra/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CCFLAG) -c -o $@ $<
+	$(U64_CC) $(U64_CCFLAG) -c -o $@ $<
 
 lib/libcart_dragon.a: $(addprefix build/dragon/,$(OBJ))
 	@mkdir -p $(dir $@)
