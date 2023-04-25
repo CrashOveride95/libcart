@@ -53,11 +53,20 @@ OBJ := \
 	sccardwrcart.o      \
 	sccardswap.o
 
+ifeq ($(MODSDK),0)
+U64_HOST    := mips-linux-gnu
+else
+U64_HOST    := mips-n64
+endif
 U64_HOST    := mips-linux-gnu
 U64_CC      := $(U64_HOST)-gcc
 U64_AR      := $(U64_HOST)-ar
 U64_ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
+ifeq ($(MODSDK),0)
 U64_FLAG    := -Iultra/include -Iinclude -D_ULTRA64
+else
+U64_FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64 -DNEWLIB
+endif
 U64_OPT     := -Os
 U64_WARN    := -Wall -Wextra -Wpedantic
 U64_CCFLAG  := $(U64_ARCH) -mno-check-zero-division -ffreestanding
@@ -76,7 +85,11 @@ N64_CCFLAG  += $(N64_FLAG) $(N64_OPT) $(N64_WARN)
 N64_ASFLAG  := $(N64_ARCH)
 
 .PHONY: default
+ifeq ($(MODSDK),0)
 default: lib/libcart_ultra.a lib/libcart_dragon.a
+else
+default: lib/libcart_ultra.a
+endif
 
 .PHONY: clean
 clean:
