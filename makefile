@@ -49,9 +49,9 @@ OBJ := \
 	sccardbyteswap.o
 
 ifeq ($(MODSDK),0)
-U64_PREFIX    := mips-linux-gnu
+U64_PREFIX    := mips-linux-gnu-
 else
-U64_PREFIX    := mips-n64
+U64_PREFIX    := mips-n64-
 endif
 U64_CC      := $(U64_PREFIX)gcc
 U64_AR      := $(U64_PREFIX)ar

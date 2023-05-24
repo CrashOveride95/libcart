@@ -3,6 +3,7 @@
 
 #ifdef _ULTRA64
 #include <ultra64.h>
+typedef u32 uint32_t;
 #else
 #include <stdint.h>
 typedef uint32_t u32;
