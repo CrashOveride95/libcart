@@ -1,8 +1,3 @@
-#                libcart - Nintendo 64 flash cartridge library
-#                     Copyright (C) 2022 - 2023 devwizard
-#      This project is licensed under the terms of the MIT license.  See
-#      LICENSE for more information.
-
 OBJ := \
 	cart.o              \
 	cartbuf.o           \
@@ -15,7 +10,7 @@ OBJ := \
 	cartcardrdcart.o    \
 	cartcardwrdram.o    \
 	cartcardwrcart.o    \
-	cartcardswap.o      \
+	cartcardbyteswap.o  \
 	ci.o                \
 	ciinit.o            \
 	ciexit.o            \
@@ -24,7 +19,7 @@ OBJ := \
 	cicardrdcart.o      \
 	cicardwrdram.o      \
 	cicardwrcart.o      \
-	cicardswap.o        \
+	cicardbyteswap.o    \
 	edxinit.o           \
 	edxexit.o           \
 	edxcard.o           \
@@ -33,7 +28,7 @@ OBJ := \
 	edxcardrdcart.o     \
 	edxcardwrdram.o     \
 	edxcardwrcart.o     \
-	edxcardswap.o       \
+	edxcardbyteswap.o   \
 	edinit.o            \
 	edexit.o            \
 	edcard.o            \
@@ -42,7 +37,7 @@ OBJ := \
 	edcardrdcart.o      \
 	edcardwrdram.o      \
 	edcardwrcart.o      \
-	edcardswap.o        \
+	edcardbyteswap.o    \
 	sc.o                \
 	scinit.o            \
 	scexit.o            \
@@ -51,16 +46,15 @@ OBJ := \
 	sccardrdcart.o      \
 	sccardwrdram.o      \
 	sccardwrcart.o      \
-	sccardswap.o
+	sccardbyteswap.o
 
 ifeq ($(MODSDK),0)
-U64_HOST    := mips-linux-gnu
+U64_PREFIX    := mips-linux-gnu
 else
-U64_HOST    := mips-n64
+U64_PREFIX    := mips-n64
 endif
-U64_HOST    := mips-linux-gnu
-U64_CC      := $(U64_HOST)-gcc
-U64_AR      := $(U64_HOST)-ar
+U64_CC      := $(U64_PREFIX)gcc
+U64_AR      := $(U64_PREFIX)ar
 U64_ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
 ifeq ($(MODSDK),0)
 U64_FLAG    := -Iultra/include -Iinclude -D_ULTRA64
@@ -79,10 +73,9 @@ N64_AR      := $(N64_INST)/bin/mips64-elf-ar
 N64_ARCH    := -march=vr4300 -mtune=vr4300
 N64_FLAG    := -I$(N64_INST)/mips64-elf/include -Iinclude -DN64
 N64_OPT     := -O2
-N64_WARN    := -Wall -Wextra -Wno-ignored-qualifiers
+N64_WARN    := -Wall -Wextra -Wpedantic
 N64_CCFLAG  := $(N64_ARCH) -falign-functions=32 -ffunction-sections -fdata-sections
 N64_CCFLAG  += $(N64_FLAG) $(N64_OPT) $(N64_WARN)
-N64_ASFLAG  := $(N64_ARCH)
 
 .PHONY: default
 ifeq ($(MODSDK),0)
@@ -110,10 +103,6 @@ build/ultra/%.o: src/%.c
 lib/libcart_dragon.a: $(addprefix build/dragon/,$(OBJ))
 	@mkdir -p $(dir $@)
 	$(N64_AR) rc $@ $^
-
-build/dragon/%.o: src/%.s
-	@mkdir -p $(dir $@)
-	$(N64_CC) $(N64_ASFLAG) -c -o $@ $<
 
 build/dragon/%.o: src/%.c
 	@mkdir -p $(dir $@)
