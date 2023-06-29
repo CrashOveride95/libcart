@@ -59,7 +59,7 @@ U64_ARCH    := -mabi=32 -march=vr4300 -mfix4300 -mno-abicalls -fno-PIC -G 0
 ifeq ($(MODSDK),0)
 U64_FLAG    := -Ilibultra/include -Iinclude -D_ULTRA64
 else
-U64_FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64 -DNEWLIB
+U64_FLAG    := -I/usr/include/n64 -Iinclude -D_ULTRA64
 endif
 U64_OPT     := -Os
 U64_WARN    := -Wall -Wextra -Wpedantic
